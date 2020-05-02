@@ -7,53 +7,56 @@ from math import ceil
 from copy import deepcopy as dp
 SIZE = 0
 MAX_DIMENSION = 0
-
+LIST= []
 def printInorder(root):
-    if root is not None:
-        printInorder(root.left)
-        print(root.key)
+    if root:
+
         printInorder(root.right)
+        print(root.key)
+
 
 def orderByLevel(node, sortedNodes, isRight, level):
-    global MAX_DIMENSION, SIZE
-    SIZE += 1
+    global MAX_DIMENSION, SIZE, LIST
+
     level_ = dp(level)
     if level_ ==  MAX_DIMENSION:
         level_ = 0
     s = sorted(sortedNodes, key=lambda x: x.key[level_])
-    median = ceil(len(sortedNodes) / 2) - 1
-
-    for i in sortedNodes:
+    '''for i in s:
         print(i.key)
-    print("\n\n")
+    print("\n\n")'''
+
+    median = ceil(len(sortedNodes) / 2) - 1
+    LIST.append(s[median])
     node.isLeaf = False
     if isRight:
-        node.right = sortedNodes[median]
+        node.right = s[median]
         node = node.right
+        SIZE += 1
     else:
-        node.left = sortedNodes[median]
+        node.left = s[median]
         node = node.left
-    if len(sortedNodes) > 1:
-        if median > 1:
-            orderByLevel(node, sortedNodes[0:median], False, level_ + 1)
-        else:
-            SIZE += 1
-            node.left = sortedNodes[0]
-        if len(sortedNodes) - median > 1:
-            orderByLevel(node, sortedNodes[median + 1:], True, level_ + 1)
-        else:
-            SIZE += 1
-            node.right = sortedNodes[0]
+        SIZE += 1
+
+    if len(s) > 2:
+        orderByLevel(node, s[0:median], False, level_ + 1)
+        orderByLevel(node, s[median + 1:], True, level_ + 1)
+    if len(s) == 2:
+        node.right = s[-1]
+        SIZE += 1
+        LIST.append(s[-1])
     return
 
 
 
 def orderTree(sortedNodes, tree):
-    global SIZE
+    global SIZE, LIST
     median = ceil (len(sortedNodes)/ 2) - 1
     tree = kdtree(sortedNodes[median])
     orderByLevel(tree.root, sortedNodes[0:median], False, 1)
     orderByLevel(tree.root, sortedNodes[median+1:], True, 1)
+    for i in LIST:
+        print(i.key)
     print(SIZE)
     return tree
 
