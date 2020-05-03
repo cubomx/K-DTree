@@ -55,7 +55,7 @@ def orderByLevel(node, sortedNodes, isRight, level):
 
 def orderNodes(nodes, tree):
     sortBy = sorted(nodes, key=lambda x: x.key[0])  # order by x
-    orderTree(sortBy, tree)
+    tree = orderTree(sortBy, tree)
     return tree
 
 
@@ -65,22 +65,58 @@ def orderTree(sortedNodes, tree):
     tree = kdtree(sortedNodes[median])
     orderByLevel(tree.root, sortedNodes[0:median], False, 1)  # search in both sides
     orderByLevel(tree.root, sortedNodes[median + 1:], True, 1)
-    printInorder(tree.root)
+    #printInorder(tree.root)
     return tree
 
+def on_range(node, mins, maxs):
+    isOnRange = True
+    for idx, limit in enumerate(mins):
+        if node.key[idx] >= mins[idx] and node.key[idx] <= maxs[idx]:
+            continue
+        else:
+            isOnRange = False
+            break
+    return isOnRange
 
 def find_initial(tree, mins, maxs):
-    # TODO: find the first node that has within all the values
-    return tree.root
+    global MAX_DIMENSION
+    level = 0
+    while True:
+        if MAX_DIMENSION == level:
+            level = 0
+        if tree:
+            if tree.key[level] >= mins[level] and tree.key[level] <= maxs[level]:
+                return tree
+            if tree.key[level] > maxs[level]:
+                tree = tree.left
+            if tree.key[level] < mins[level]:
+                tree = tree.right
+            level += 1
+    return tree
 
+def search_sons(node, level, mins, maxs):
+    global MAX_DIMENSION
+    level_ = dp(level)
+    if MAX_DIMENSION == level_:
+        level_ = 0
+    if node:
+        if node.key[level_] >= mins[level_] and node.key[level_] <= maxs[level_]:
+            if on_range(node, mins, maxs): print(node.key)
+            search_sons(node.right, level_ + 1, mins, maxs)
+            search_sons(node.left, level_ + 1, mins, maxs)
+        if node.key[level_] > maxs[level_]:
+            search_sons(node.left, level_ + 1, mins, maxs)
+        if node.key[level_] < mins[level_]:
+            search_sons(node.right, level_ + 1, mins, maxs)
 
 def search(tree, mins, maxs):
-    explorer = find_initial(tree, mins, maxs)
+    explorer = find_initial(tree.root, mins, maxs)
+    if on_range(explorer, mins, maxs):
+        print(explorer.key)
     level = 1
-    explorer = explorer.left
-    ''' 
-        TODO: Do the search by level 
-    '''
+    search_sons(explorer.left, level, mins, maxs)
+    search_sons(explorer.right, level, mins, maxs)
+
     return
 
 
@@ -98,6 +134,11 @@ def main():
     global MAX_DIMENSION
     MAX_DIMENSION = len(nodes[0].key)
     tree = orderNodes(nodes, tree)
+    ''' 
+    In both arrays [minimum values] [maximum values], the first element is the x limit, and y limit and continues
+    till the dimensions of the K-D Tree
+    '''
+    search(tree, [50, 20], [90, 90])
     file.close()
 
 
