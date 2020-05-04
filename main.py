@@ -65,8 +65,9 @@ def orderTree(sortedNodes, tree):
     tree = kdtree(sortedNodes[median])
     orderByLevel(tree.root, sortedNodes[0:median], False, 1)  # search in both sides
     orderByLevel(tree.root, sortedNodes[median + 1:], True, 1)
-    #printInorder(tree.root)
+    # printInorder(tree.root)
     return tree
+
 
 def on_range(node, mins, maxs):
     isOnRange = True
@@ -78,21 +79,25 @@ def on_range(node, mins, maxs):
             break
     return isOnRange
 
+
 def find_initial(tree, mins, maxs):
     global MAX_DIMENSION
     level = 0
     while True:
         if MAX_DIMENSION == level:
             level = 0
+        if not tree:
+            return None
         if tree:
             if tree.key[level] >= mins[level] and tree.key[level] <= maxs[level]:
                 return tree
+
             if tree.key[level] > maxs[level]:
                 tree = tree.left
-            if tree.key[level] < mins[level]:
+            elif tree.key[level] < mins[level]:
                 tree = tree.right
             level += 1
-    return tree
+    return None
 
 def search_sons(node, level, mins, maxs):
     global MAX_DIMENSION
@@ -109,8 +114,12 @@ def search_sons(node, level, mins, maxs):
         if node.key[level_] < mins[level_]:
             search_sons(node.right, level_ + 1, mins, maxs)
 
+
 def search(tree, mins, maxs):
     explorer = find_initial(tree.root, mins, maxs)
+    if not explorer:
+        print("Not values in the requested intervals")
+        return
     if on_range(explorer, mins, maxs):
         print(explorer.key)
     level = 1
@@ -138,7 +147,7 @@ def main():
     In both arrays [minimum values] [maximum values], the first element is the x limit, and y limit and continues
     till the dimensions of the K-D Tree
     '''
-    search(tree, [50, 20], [90, 90])
+    search(tree, [10, 10], [50, 50])
     file.close()
 
 
