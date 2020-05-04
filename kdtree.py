@@ -10,5 +10,5 @@ class Node():
         self.isLeaf = True
 
     def __str__(self):
-        return self.key
+        return self.key  # print the key as an array value
 
